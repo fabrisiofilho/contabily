@@ -20,6 +20,7 @@ files:
   - out/main/**
   - out/preload/**
   - out/renderer/**
+  - '!node_modules/@mui/icons-material/**'
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
