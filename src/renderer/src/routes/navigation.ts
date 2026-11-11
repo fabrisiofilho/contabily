@@ -3,6 +3,7 @@ import type { IDrawerItem } from '@renderer/types/drawer/drawerItem';
 /** Áreas de produto independentes das URLs e dos componentes das telas. */
 export const navigationAreas = [
   { label: 'Visão geral', routes: ['dashboard'] },
+  { label: 'Assistente', routes: ['assistant'] },
   {
     label: 'Movimentações',
     routes: ['transactions', 'transfers', 'recurring'],

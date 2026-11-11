@@ -22,6 +22,9 @@ import RepeatOutlinedIcon from '@mui/icons-material/RepeatOutlined';
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
+import MicNoneOutlinedIcon from '@mui/icons-material/MicNoneOutlined';
+import { assistantEnabled } from '../../../shared/assistantAvailability';
+import { AssistantPage } from '../pages/Assistant';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import { ManualPage } from '@renderer/pages/Manual';
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -96,6 +99,18 @@ const ROUTES_ITEMS: WithRouteProps<IDrawerItem>[] = [
     canAccess: true,
     routeElement: <InvestmentsPage />,
     routePath: '/investments',
+  },
+  {
+    label: 'Assistente',
+    path: '/panel/assistant',
+    icon: <MicNoneOutlinedIcon />,
+    canAccess: assistantEnabled,
+    routeElement: assistantEnabled ? (
+      <AssistantPage />
+    ) : (
+      <Navigate to="/panel/dashboard" replace />
+    ),
+    routePath: '/assistant',
   },
   {
     label: 'Dashboard',

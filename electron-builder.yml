@@ -43,6 +43,13 @@ win:
   icon: build/icon.ico
   target: nsis
   defaultArch: x64
+  extraResources:
+    - from: resources
+      to: .
+      filter:
+        - 'whisper/whisper-cli.exe'
+        - 'whisper/*.dll'
+        - 'whisper/ggml-tiny.bin'
 
 nsis:
   artifactName: ${productName}-setup-${version}.${ext}

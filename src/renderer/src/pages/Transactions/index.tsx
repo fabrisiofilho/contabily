@@ -2,7 +2,8 @@ import { useFinanceRefresh } from '@renderer/hooks/financeRefresh';
 import { MultiFilter, InfiniteMore } from '@renderer/components/BoardListing';
 import { Input } from '@renderer/components/Form/Input';
 import { useRequestSequence } from '@renderer/hooks/requestSequence';
-import { useSearchParams } from 'react-router-dom';
+import type { AssistantDraft } from '../../../../shared/assistantDraft';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { ContentLoading } from '@renderer/components/ContentLoading';
 import { PageHeader } from '@renderer/components/PageHeader';
 import { AppAlert } from '@renderer/components/Feedback';
@@ -77,6 +78,12 @@ const MONTH_NAMES = [
 ];
 export function TransactionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { state } = useLocation();
+  const [assistantSaved, setAssistantSaved] = useState<Pick<
+    CreateTransactionInput,
+    'description' | 'amount'
+  > | null>(null);
+  const [initialDraft, setInitialDraft] = useState<AssistantDraft>();
   const [initialType, setInitialType] = useState<TransactionType>('expense');
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -110,11 +117,14 @@ export function TransactionsPage() {
   useEffect(() => {
     const create = searchParams.get('new');
     if (create === 'income' || create === 'expense') {
+      const draft = state?.assistantDraft as AssistantDraft | undefined;
+      if (draft?.type === create) setAssistantSaved(null);
+      setInitialDraft(draft?.type === create ? draft : undefined);
       setInitialType(create);
       setIsFormOpen(true);
       setSearchParams({}, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, state]);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [formLoading, setFormLoading] = useState(false);
@@ -314,6 +324,7 @@ export function TransactionsPage() {
     setIsFormOpen(true);
   };
   const handleCloseForm = () => {
+    setInitialDraft(undefined);
     setIsFormOpen(false);
     setSelectedTransaction(null);
   };
@@ -333,6 +344,12 @@ export function TransactionsPage() {
         if (!response.success) {
           throw new Error(response.error ?? 'Erro ao criar transação');
         }
+      }
+      if (initialDraft) {
+        setAssistantSaved({
+          description: data.description,
+          amount: data.amount,
+        });
       }
       refreshTransactions();
     } finally {
@@ -364,6 +381,16 @@ export function TransactionsPage() {
 
   return (
     <TransactionsContainer>
+      {assistantSaved !== null && (
+        <AppAlert
+          severity="success"
+          sx={{ mb: 3 }}
+          onClose={() => setAssistantSaved(null)}
+        >
+          Registrado: {assistantSaved.description} ·{' '}
+          {formatCurrency(assistantSaved.amount)}.
+        </AppAlert>
+      )}
       <PageHeader
         title="Transações"
         description={<>Gerencie suas receitas e despesas</>}
@@ -779,6 +806,7 @@ export function TransactionsPage() {
           onSave={handleSaveTransaction}
           transaction={selectedTransaction}
           initialType={initialType}
+          initialDraft={initialDraft}
           categories={categories}
           accounts={accounts}
           loading={formLoading}

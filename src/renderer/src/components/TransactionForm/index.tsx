@@ -75,6 +75,7 @@ interface TransactionFormProps {
   accounts: Account[];
   loading?: boolean;
   initialType?: TransactionType;
+  initialDraft?: { description: string; amount: number };
 }
 const createValidationSchema = (type: TransactionType) =>
   yup.object().shape({
@@ -179,6 +180,7 @@ export function TransactionForm({
   accounts,
   loading = false,
   initialType = 'expense',
+  initialDraft,
 }: Readonly<TransactionFormProps>) {
   const [moreOptions, setMoreOptions] = useState(false);
   const [quick, setQuick] = useState<'account' | 'category' | null>(null);
@@ -192,8 +194,8 @@ export function TransactionForm({
   const defaultValues: TransactionFormData = useMemo(
     () => ({
       type: transaction?.type ?? initialType,
-      description: transaction?.description ?? '',
-      amount: transaction?.amount ?? 0,
+      description: transaction?.description ?? initialDraft?.description ?? '',
+      amount: transaction?.amount ?? initialDraft?.amount ?? 0,
       categoryId: transaction?.categoryId ?? 0,
       accountId: transaction?.accountId ?? 0,
       transactionDate: transaction?.transactionDate
@@ -210,7 +212,7 @@ export function TransactionForm({
       hasInstallments: (transaction?.totalInstallments ?? 0) > 1,
       totalInstallments: transaction?.totalInstallments ?? 2,
     }),
-    [transaction, initialType],
+    [transaction, initialType, initialDraft],
   );
   const {
     control,

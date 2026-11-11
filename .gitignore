@@ -8,3 +8,4 @@ out
 .qa/
 *.log*
 .env
+/resources/whisper/
